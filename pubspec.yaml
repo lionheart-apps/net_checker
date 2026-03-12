@@ -2,6 +2,8 @@ name: net_checker
 description: "A lightweight Flutter package to check internet connectivity, monitor connection changes, measure latency, and detect network quality."
 version: 0.0.1
 homepage: https://lionheartapps.com
+repository: https://github.com/lionheart-apps/net_checker
+
 
 topics:
   - connectivity
