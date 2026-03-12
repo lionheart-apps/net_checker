@@ -1,12 +1,19 @@
-# internet_checker_plus
+# net_checker
+
+[![pub version](https://img.shields.io/pub/v/net_checker.svg)](https://pub.dev/packages/net_checker)
+[![likes](https://img.shields.io/pub/likes/net_checker)](https://pub.dev/packages/net_checker/score)
+[![popularity](https://img.shields.io/pub/popularity/net_checker)](https://pub.dev/packages/net_checker/score)
+[![license](https://img.shields.io/github/license/lionheart-apps/net_checker)](LICENSE)
 
 A lightweight Flutter package to check internet connectivity, monitor connection changes, measure latency, and detect network quality.
 
-Version: 0.0.1
+Version: **0.0.1**
+
+---
 
 ## Features
 
-- Check internet connectivity
+- Internet connectivity check
 - Custom host configuration
 - Real-time internet monitoring
 - Network latency measurement
@@ -14,13 +21,15 @@ Version: 0.0.1
 - Optional UI widgets
 - No third-party dependencies
 
+---
+
 ## Installation
 
-Add this to your pubspec.yaml
+Add this to your **pubspec.yaml**
 
 ```yaml
 dependencies:
-  internet_checker_plus: ^0.0.1
+  net_checker: ^0.0.1
 ```
 
 Then run
@@ -29,11 +38,15 @@ Then run
 flutter pub get
 ```
 
+---
+
 ## Import
 
 ```dart
 import 'package:net_checker/net_checker.dart';
 ```
+
+---
 
 ## Check Internet Connection
 
@@ -41,6 +54,8 @@ import 'package:net_checker/net_checker.dart';
 bool connected = await InternetChecker.hasConnection();
 print("Connected: $connected");
 ```
+
+---
 
 ## Custom Configuration
 
@@ -58,6 +73,8 @@ Use it like this
 bool connected = await InternetChecker.hasConnection(config: config);
 ```
 
+---
+
 ## Listen to Internet Changes
 
 ```dart
@@ -66,12 +83,16 @@ InternetConnectionStream.start().listen((status) {
 });
 ```
 
+---
+
 ## Network Latency
 
 ```dart
 int? latency = await LatencyChecker.getLatency();
 print("Latency: $latency ms");
 ```
+
+---
 
 ## Network Quality
 
@@ -80,15 +101,17 @@ String quality = await NetworkQuality.getQuality();
 print("Connection quality: $quality");
 ```
 
+---
+
 ## Widgets
 
-Internet status indicator
+### Internet Status Indicator
 
 ```dart
 InternetStatusIndicator()
 ```
 
-Internet status builder
+### Internet Status Builder
 
 ```dart
 InternetStatusBuilder(
@@ -98,7 +121,7 @@ InternetStatusBuilder(
 )
 ```
 
-No internet banner
+### No Internet Banner
 
 ```dart
 NoInternetBanner(
