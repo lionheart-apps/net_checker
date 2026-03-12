@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:net_checker/net_checker.dart';
 
@@ -10,7 +11,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(home: HomePage());
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: HomePage(),
+    );
   }
 }
 
@@ -23,23 +27,55 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String status = "Checking...";
+  StreamSubscription? subscription;
 
   @override
   void initState() {
     super.initState();
 
-    InternetConnectionStream.start().listen((s) {
+    subscription = InternetConnectionStream.start().listen((connection) {
       setState(() {
-        status = s.name;
+        status = connection.toString().split('.').last;
       });
     });
   }
 
   @override
+  void dispose() {
+    subscription?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Internet Checker Example")),
-      body: Center(child: Text(status, style: const TextStyle(fontSize: 20))),
+      appBar: AppBar(
+        title: const Text("Net Checker Example"),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.wifi,
+              size: 60,
+            ),
+            const SizedBox(height: 20),
+            Text(
+              "Connection Status",
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              status,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

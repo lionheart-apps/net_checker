@@ -1,6 +1,6 @@
-## 0.0.1
+## 0.0.2
 
-Initial release of **internet_checker_plus**.
+Initial stable release of **net_checker**.
 
 ### Added
 
