@@ -1,0 +1,17 @@
+name: net_checker_example
+description: Example app for net_checker package.
+version: 0.0.1
+publish_to: "none"
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  net_checker:
+    path: ../
+
+flutter:
+  uses-material-design: true
