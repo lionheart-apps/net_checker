@@ -1,4 +1,15 @@
-library net_checker;
+// A lightweight Flutter package for monitoring internet connectivity,
+// measuring network latency, and detecting connection quality.
+//
+// The net_checker package provides utilities to:
+//
+// - Check whether the device is connected to the internet
+// - Monitor connection changes using a stream
+// - Measure network latency
+// - Determine network quality
+// - Display connectivity status using ready-to-use Flutter widgets
+//
+// This package is designed to be simple and lightweight.
 
 export 'src/config/internet_config.dart';
 

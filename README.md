@@ -7,19 +7,32 @@
 
 A lightweight Flutter package to check internet connectivity, monitor connection changes, measure latency, and detect network quality.
 
-Version: **0.0.1**
-
 ---
 
 ## Features
 
-- Internet connectivity check
-- Custom host configuration
-- Real-time internet monitoring
-- Network latency measurement
-- Network quality detection
-- Optional UI widgets
-- No third-party dependencies
+| Feature                            | Supported |
+| ---------------------------------- | --------- |
+| Internet connectivity check        | ✓         |
+| Real-time connection monitoring    | ✓         |
+| Network latency measurement        | ✓         |
+| Network quality detection          | ✓         |
+| Custom host configuration          | ✓         |
+| UI widgets for connectivity status | ✓         |
+| Cross platform support             | ✓         |
+
+---
+
+## Platform Support
+
+| Platform | Supported |
+| -------- | --------- |
+| Android  | ✓         |
+| iOS      | ✓         |
+| Web      | ✓         |
+| Windows  | ✓         |
+| macOS    | ✓         |
+| Linux    | ✓         |
 
 ---
 
@@ -29,7 +42,7 @@ Add this to your **pubspec.yaml**
 
 ```yaml
 dependencies:
-  net_checker: ^0.0.1
+  net_checker: ^latest
 ```
 
 Then run

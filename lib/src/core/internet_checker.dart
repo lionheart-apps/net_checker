@@ -1,22 +1,32 @@
-import 'dart:io';
 import '../config/internet_config.dart';
 
+import 'internet_checker_io.dart'
+    if (dart.library.html) 'internet_checker_web.dart';
+
+/// Provides utilities to check internet connectivity.
+///
+/// This class delegates the actual connectivity check to the
+/// platform-specific implementation.
+///
+/// Supported platforms:
+/// - Android
+/// - iOS
+/// - Windows
+/// - macOS
+/// - Linux
+/// - Web
 class InternetChecker {
+  /// Checks whether the device currently has an internet connection.
+  ///
+  /// The connectivity check behavior is controlled by [InternetConfig].
+  ///
+  /// Example:
+  /// ```dart
+  /// bool connected = await InternetChecker.hasConnection();
+  /// ```
   static Future<bool> hasConnection({
     InternetConfig config = const InternetConfig(),
   }) async {
-    for (final host in config.hosts) {
-      try {
-        final result = await InternetAddress.lookup(
-          host,
-        ).timeout(config.timeout);
-
-        if (result.isNotEmpty) {
-          return true;
-        }
-      } catch (_) {}
-    }
-
-    return false;
+    return InternetCheckerImpl.hasConnection(config);
   }
 }
