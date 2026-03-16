@@ -1,55 +1,19 @@
-import 'dart:io';
 import '../config/internet_config.dart';
+
+import 'latency_checker_io.dart'
+    if (dart.library.html) 'latency_checker_web.dart';
 
 /// Provides utilities for measuring network latency.
 ///
-/// The [LatencyChecker] measures the time taken to resolve a host
-/// defined in [InternetConfig.latencyHost]. This duration represents
-/// an approximate network latency between the device and the host.
-///
-/// If the host cannot be resolved, the method returns `null`.
+/// This class automatically selects the correct implementation
+/// depending on the platform (IO or Web).
 class LatencyChecker {
-  /// Measures network latency to the configured host.
+  /// Measures latency to the configured host.
   ///
-  /// The latency is calculated by resolving the host defined in
-  /// [InternetConfig.latencyHost] and measuring the elapsed time.
-  ///
-  /// Returns the latency in **milliseconds**, or `null` if the host
-  /// cannot be resolved.
-  ///
-  /// Example:
-  /// ```dart
-  /// int? latency = await LatencyChecker.getLatency();
-  ///
-  /// if (latency != null) {
-  ///   print("Latency: ${latency} ms");
-  /// } else {
-  ///   print("Unable to measure latency");
-  /// }
-  /// ```
-  ///
-  /// A custom configuration can also be provided:
-  ///
-  /// ```dart
-  /// final config = InternetConfig(
-  ///   latencyHost: "example.com",
-  /// );
-  ///
-  /// int? latency = await LatencyChecker.getLatency(config: config);
-  /// ```
+  /// Returns latency in milliseconds or null if measurement fails.
   static Future<int?> getLatency({
     InternetConfig config = const InternetConfig(),
   }) async {
-    final stopwatch = Stopwatch()..start();
-
-    try {
-      await InternetAddress.lookup(config.latencyHost);
-
-      stopwatch.stop();
-
-      return stopwatch.elapsedMilliseconds;
-    } catch (_) {
-      return null;
-    }
+    return LatencyCheckerImpl.getLatency(config);
   }
 }

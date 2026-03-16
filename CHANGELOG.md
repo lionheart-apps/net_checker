@@ -1,3 +1,9 @@
+## 0.0.4
+
+### Improved
+- Minor documentation updates
+- Internal improvements and cleanup
+
 ## 0.0.3
 
 Improved release of **net_checker** with cross-platform support and documentation improvements.
