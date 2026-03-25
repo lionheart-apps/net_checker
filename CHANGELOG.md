@@ -1,6 +1,30 @@
+## 0.0.5
+
+Refinement release with improved Web behavior and example app updates.
+
+### Added
+
+- Device/platform information in example app
+
+### Improved
+
+- Improved example app to handle connection state more reliably
+- Better handling of loading, retry, and disconnected states in UI
+
+### Fixed
+
+- Fixed Web connectivity inconsistencies in example usage
+- Fixed cases where connection state could appear incorrect on initial load
+
+### Notes
+
+- Web platform behavior depends on browser limitations (CORS, network state)
+- No major changes to core package APIs
+
 ## 0.0.4
 
 ### Improved
+
 - Minor documentation updates
 - Internal improvements and cleanup
 

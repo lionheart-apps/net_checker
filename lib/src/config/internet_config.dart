@@ -1,36 +1,89 @@
 /// Configuration settings used by the internet checking utilities.
 ///
-/// This class allows developers to customize how connectivity checks
-/// are performed by the `net_checker` package.
+/// This class ensures all hosts are converted into a **valid usable format**
+/// so other classes can directly use them without extra checks.
 ///
-/// It controls:
-/// - Which hosts are used to verify connectivity
-/// - Timeout duration for connection checks
-/// - Interval for periodic connectivity monitoring
-/// - Host used to measure latency
+/// Supports inputs like:
+/// - google.com
+/// - http://google.com
+/// - https://google.com
+/// - 1.1.1.1
+///
+/// Output will ALWAYS be:
+/// - Proper Uri (with scheme)
 class InternetConfig {
-  /// List of hosts used to verify internet connectivity.
-  ///
-  /// The checker will attempt to resolve these hosts to determine
-  /// if the device has an active internet connection.
+  /// Raw hosts provided by user
   final List<String> hosts;
 
-  /// Maximum duration allowed for a connectivity check before timing out.
+  /// Timeout for requests
   final Duration timeout;
 
-  /// Interval used for repeated connectivity checks when using streams.
+  /// Interval for stream checks
   final Duration checkInterval;
 
-  /// Host used specifically for measuring network latency.
+  /// Host used for latency
   final String latencyHost;
 
-  /// Creates a configuration for internet connectivity checks.
-  ///
-  /// Default hosts include common DNS servers to improve reliability.
   const InternetConfig({
-    this.hosts = const ["1.1.1.1", "8.8.8.8", "google.com"],
+    this.hosts = const [
+      "google.com",
+      "lionheartapps.com",
+      "1.1.1.1",
+      "8.8.8.8",
+    ],
     this.timeout = const Duration(seconds: 3),
     this.checkInterval = const Duration(seconds: 5),
     this.latencyHost = "google.com",
   });
+
+  /// ✅ FINAL: Always return valid URIs
+  ///
+  /// Rules:
+  /// - If scheme exists → keep it
+  /// - If missing → default to http
+  /// - Remove trailing slash
+  /// - Skip invalid values
+  List<Uri> get parsedHosts {
+    return hosts
+        .map((host) {
+          var h = host.trim();
+
+          if (h.isEmpty) return null;
+
+          // remove trailing slash
+          if (h.endsWith('/')) {
+            h = h.substring(0, h.length - 1);
+          }
+
+          Uri? uri = Uri.tryParse(h);
+
+          // If no scheme → add http
+          if (uri == null || uri.scheme.isEmpty) {
+            uri = Uri.tryParse("http://$h");
+          }
+
+          return uri;
+        })
+        .whereType<Uri>()
+        .toList();
+  }
+
+  /// ✅ Parsed latency host
+  Uri? get parsedLatencyHost {
+    var h = latencyHost.trim();
+
+    if (h.isEmpty) return null;
+
+    if (h.endsWith('/')) {
+      h = h.substring(0, h.length - 1);
+    }
+
+    Uri? uri = Uri.tryParse(h);
+
+    if (uri == null || uri.scheme.isEmpty) {
+      uri = Uri.tryParse("http://$h");
+    }
+
+    return uri;
+  }
 }

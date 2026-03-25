@@ -13,7 +13,7 @@ class LatencyChecker {
   /// Returns latency in milliseconds or null if measurement fails.
   static Future<int?> getLatency({
     InternetConfig config = const InternetConfig(),
-  }) async {
+  }) {
     return LatencyCheckerImpl.getLatency(config);
   }
 }

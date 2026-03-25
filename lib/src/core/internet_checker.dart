@@ -29,4 +29,17 @@ class InternetChecker {
   }) async {
     return InternetCheckerImpl.hasConnection(config);
   }
+
+  /// ✅ NEW: Returns the first working host
+  ///
+  /// Useful for debugging / testing
+  ///
+  /// Returns:
+  /// - host string if success
+  /// - null if no connection
+  static Future<String?> getWorkingHost({
+    InternetConfig config = const InternetConfig(),
+  }) {
+    return InternetCheckerImpl.getWorkingHost(config);
+  }
 }

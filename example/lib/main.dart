@@ -1,27 +1,27 @@
 import 'dart:async';
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:net_checker/net_checker.dart';
 
-/// Entry point of the example application.
 void main() {
   runApp(const MyApp());
 }
 
-/// Root widget of the demo app.
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomePage(),
+      title: 'Net Checker',
+      theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.blue),
+      home: const HomePage(),
     );
   }
 }
 
-/// Example screen demonstrating how to use the `net_checker` package
-/// to monitor internet connectivity in real-time.
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -30,69 +30,220 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  /// Holds the current connection status displayed in the UI.
-  String status = "Checking...";
+  ConnectionStatus status = ConnectionStatus.disconnected;
 
-  /// Subscription to the connectivity stream.
-  StreamSubscription? subscription;
+  int? latency;
+  String quality = NetworkQuality.disconnected;
+  String? workingHost;
+
+  final config = const InternetConfig(
+    checkInterval: Duration(seconds: 2),
+  );
+
+  StreamSubscription? sub;
+
+  bool get isConnected => status == ConnectionStatus.connected;
+
+  Color get statusColor => isConnected ? Colors.green : Colors.red;
+
+  Color get latencyColor => NetworkQuality.getColorFromLatency(latency);
+
+  Color get qualityColor => NetworkQuality.getColor(quality);
+
+  String get deviceType {
+    if (kIsWeb) return "Web";
+    if (Platform.isAndroid) return "Android";
+    if (Platform.isIOS) return "iOS";
+    if (Platform.isWindows) return "Windows";
+    if (Platform.isMacOS) return "macOS";
+    if (Platform.isLinux) return "Linux";
+    return "Device";
+  }
+
+  /// 🔥 REAL CHECK (ONLY SOURCE)
+  Future<void> _checkNow() async {
+    bool connected = false;
+
+    try {
+      connected = await InternetChecker.hasConnection(config: config)
+          .timeout(const Duration(seconds: 3));
+    } catch (_) {
+      connected = false;
+    }
+
+    if (!mounted) return;
+
+    /// 🔥 Prevent unnecessary rebuilds
+    if (connected && status == ConnectionStatus.connected) return;
+    if (!connected && status == ConnectionStatus.disconnected) return;
+
+    if (connected) {
+      final l = await LatencyChecker.getLatency(config: config);
+      final q = await NetworkQuality.getQuality(config: config);
+      final host = await InternetChecker.getWorkingHost(config: config);
+
+      setState(() {
+        status = ConnectionStatus.connected;
+        latency = l;
+        quality = q;
+        workingHost = host;
+      });
+    } else {
+      setState(() {
+        status = ConnectionStatus.disconnected;
+        latency = null;
+        quality = NetworkQuality.disconnected;
+        workingHost = null;
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
 
-    /// Listen to connectivity changes using the stream provided
-    /// by the `InternetConnectionStream` class.
-    subscription = InternetConnectionStream.start().listen((connection) {
-      setState(() {
-        /// Convert enum value to readable string.
-        status = connection.toString().split('.').last;
-      });
+    /// 🔥 STEP 1: Force initial state (important for Web)
+    status = ConnectionStatus.disconnected;
+    quality = NetworkQuality.disconnected;
+
+    /// 🔥 STEP 2: Delay first check (Web fix)
+    Future.delayed(const Duration(milliseconds: 300), () {
+      _checkNow();
+    });
+
+    /// 🔥 STEP 3: Stream trigger
+    sub = InternetConnectionStream.start(config: config).listen((_) {
+      _checkNow();
     });
   }
 
   @override
   void dispose() {
-    /// Cancel the stream subscription to avoid memory leaks.
-    subscription?.cancel();
+    sub?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Net Checker Example"),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            /// Simple connectivity icon
-            const Icon(
-              Icons.wifi,
-              size: 60,
-            ),
-
-            const SizedBox(height: 20),
-
-            Text(
-              "Connection Status",
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-
-            const SizedBox(height: 10),
-
-            /// Display current connectivity state
-            Text(
-              status,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
+      appBar: AppBar(title: const Text("Net Checker Demo")),
+      body: Column(
+        children: [
+          if (!isConnected)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(10),
+              color: Colors.red,
+              child: const Text(
+                "You're offline",
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white),
               ),
             ),
-          ],
-        ),
+
+          Expanded(
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      isConnected ? Icons.wifi : Icons.wifi_off,
+                      size: 80,
+                      color: statusColor,
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      isConnected ? "Connected" : "Disconnected",
+                      style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                        color: statusColor,
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Column(
+                        children: [
+                          _row(
+                            "Latency",
+                            latency != null ? "$latency ms" : "--",
+                            latencyColor,
+                          ),
+                          const SizedBox(height: 10),
+                          _row("Quality", quality, qualityColor),
+                          const SizedBox(height: 10),
+                          _row("Host", workingHost ?? "--", Colors.blue),
+                          const SizedBox(height: 10),
+                          _row("Device", deviceType, Colors.purple),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    ElevatedButton.icon(
+                      onPressed: _checkNow,
+                      icon: const Icon(Icons.refresh),
+                      label: const Text("Check Now"),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          /// FOOTER
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Column(
+              children: const [
+                Text(
+                  "net_checker • Flutter Package",
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+                SizedBox(height: 4),
+                Text.rich(
+                  TextSpan(
+                    text: "Powered by ",
+                    style: TextStyle(color: Colors.grey),
+                    children: [
+                      TextSpan(
+                        text: "Lionheartapps",
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Text(
+                  "www.lionheartapps.com",
+                  style: TextStyle(fontSize: 11, color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _row(String t, String v, Color c) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(t),
+        Text(
+          v,
+          style: TextStyle(fontWeight: FontWeight.bold, color: c),
+        ),
+      ],
     );
   }
 }

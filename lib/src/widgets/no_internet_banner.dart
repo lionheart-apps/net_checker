@@ -7,56 +7,41 @@ import 'package:flutter/material.dart';
 ///
 /// The banner becomes visible only when the [visible] property is set to `true`.
 /// When `false`, the widget renders an empty space.
-///
-/// Example:
-/// ```dart
-/// NoInternetBanner(
-///   visible: true,
-/// )
-/// ```
-///
-/// Custom message example:
-/// ```dart
-/// NoInternetBanner(
-///   visible: true,
-///   message: "You're currently offline",
-/// )
-/// ```
 class NoInternetBanner extends StatelessWidget {
   /// Controls whether the banner is visible.
-  ///
-  /// If `true`, the banner will be displayed.
-  /// If `false`, an empty widget will be rendered.
   final bool visible;
 
   /// The message displayed inside the banner.
-  ///
-  /// Defaults to `"No Internet Connection"`.
   final String message;
 
+  /// Background color of the banner
+  final Color backgroundColor;
+
+  /// Text style of the message
+  final TextStyle textStyle;
+
+  /// Padding inside the banner
+  final EdgeInsets padding;
+
   /// Creates a [NoInternetBanner] widget.
-  ///
-  /// The [visible] parameter determines whether the banner
-  /// should be shown.
   const NoInternetBanner({
     super.key,
     required this.visible,
     this.message = "No Internet Connection",
+    this.backgroundColor = Colors.red,
+    this.textStyle = const TextStyle(color: Colors.white),
+    this.padding = const EdgeInsets.all(8),
   });
 
   @override
   Widget build(BuildContext context) {
-    if (!visible) return const SizedBox();
+    if (!visible) return const SizedBox.shrink();
 
     return Container(
       width: double.infinity,
-      color: Colors.red,
-      padding: const EdgeInsets.all(8),
-      child: Text(
-        message,
-        textAlign: TextAlign.center,
-        style: const TextStyle(color: Colors.white),
-      ),
+      color: backgroundColor,
+      padding: padding,
+      child: Text(message, textAlign: TextAlign.center, style: textStyle),
     );
   }
 }

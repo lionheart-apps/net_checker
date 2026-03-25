@@ -21,5 +21,18 @@ enum ConnectionStatus {
   connected,
 
   /// Indicates that the device is not connected to the internet.
-  disconnected,
+  disconnected;
+
+  /// Returns a readable string value.
+  ///
+  /// ⚠️ This does NOT affect existing behavior.
+  /// Safe addition (non-breaking).
+  String get label {
+    switch (this) {
+      case ConnectionStatus.connected:
+        return "Connected";
+      case ConnectionStatus.disconnected:
+        return "Disconnected";
+    }
+  }
 }

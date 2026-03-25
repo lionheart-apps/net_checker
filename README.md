@@ -5,11 +5,11 @@
 [![popularity](https://img.shields.io/pub/popularity/net_checker)](https://pub.dev/packages/net_checker/score)
 [![license](https://img.shields.io/github/license/lionheart-apps/net_checker)](LICENSE)
 
-A lightweight Flutter package to check internet connectivity, monitor connection changes, measure latency, and detect network quality.
+A lightweight and cross-platform Flutter package to check internet connectivity, monitor connection changes, measure latency, detect network quality, and identify working hosts.
 
 ---
 
-## Features
+## ✨ Features
 
 | Feature                            | Supported |
 | ---------------------------------- | --------- |
@@ -17,35 +17,32 @@ A lightweight Flutter package to check internet connectivity, monitor connection
 | Real-time connection monitoring    | ✓         |
 | Network latency measurement        | ✓         |
 | Network quality detection          | ✓         |
+| Working host detection             | ✓         |
 | Custom host configuration          | ✓         |
 | UI widgets for connectivity status | ✓         |
-| Cross platform support             | ✓         |
+| Cross-platform support             | ✓         |
 
 ---
 
-## Platform Support
+## 📱 Platform Support
 
-| Platform | Supported |
-| -------- | --------- |
-| Android  | ✓         |
-| iOS      | ✓         |
-| Web      | ✓         |
-| Windows  | ✓         |
-| macOS    | ✓         |
-| Linux    | ✓         |
+| Platform | Supported | Notes |
+| -------- | --------- | ----- |
+| Android  | ✓         | Requires INTERNET permission |
+| iOS      | ✓         | No extra permission required |
+| Web      | ✓         | Limited by browser security (CORS) |
+| Windows  | ✓         | No extra setup |
+| macOS    | ✓         | No extra setup |
+| Linux    | ✓         | No extra setup |
 
 ---
 
-## Installation
-
-Add this to your **pubspec.yaml**
+## 🚀 Installation
 
 ```yaml
 dependencies:
   net_checker: ^latest
 ```
-
-Then run
 
 ```bash
 flutter pub get
@@ -53,7 +50,7 @@ flutter pub get
 
 ---
 
-## Import
+## 📦 Import
 
 ```dart
 import 'package:net_checker/net_checker.dart';
@@ -61,34 +58,39 @@ import 'package:net_checker/net_checker.dart';
 
 ---
 
-## Check Internet Connection
+## 🔌 Check Internet Connection
 
 ```dart
 bool connected = await InternetChecker.hasConnection();
-print("Connected: $connected");
 ```
 
 ---
 
-## Custom Configuration
+## 🌐 Get Working Host
 
 ```dart
-final config = InternetConfig(
-  hosts: ["example.com", "cloudflare.com", "8.8.8.8"],
-  timeout: Duration(seconds: 3),
-  checkInterval: Duration(seconds: 5),
-);
-```
-
-Use it like this
-
-```dart
-bool connected = await InternetChecker.hasConnection(config: config);
+String? host = await InternetChecker.getWorkingHost();
 ```
 
 ---
 
-## Listen to Internet Changes
+## ⚡ Network Latency
+
+```dart
+int? latency = await LatencyChecker.getLatency();
+```
+
+---
+
+## 📊 Network Quality
+
+```dart
+String quality = await NetworkQuality.getQuality();
+```
+
+---
+
+## 🔄 Listen to Connection Changes
 
 ```dart
 InternetConnectionStream.start().listen((status) {
@@ -98,25 +100,28 @@ InternetConnectionStream.start().listen((status) {
 
 ---
 
-## Network Latency
+## ⚙️ Custom Configuration
 
 ```dart
-int? latency = await LatencyChecker.getLatency();
-print("Latency: $latency ms");
+final config = InternetConfig(
+  hosts: ["google.com", "cloudflare.com", "1.1.1.1"],
+  timeout: Duration(seconds: 3),
+  checkInterval: Duration(seconds: 5),
+);
+```
+
+### Usage with config
+
+```dart
+await InternetChecker.hasConnection(config: config);
+await LatencyChecker.getLatency(config: config);
+await NetworkQuality.getQuality(config: config);
+await InternetChecker.getWorkingHost(config: config);
 ```
 
 ---
 
-## Network Quality
-
-```dart
-String quality = await NetworkQuality.getQuality();
-print("Connection quality: $quality");
-```
-
----
-
-## Widgets
+## 🧩 Widgets
 
 ### Internet Status Indicator
 
@@ -137,7 +142,73 @@ InternetStatusBuilder(
 ### No Internet Banner
 
 ```dart
-NoInternetBanner(
-  visible: true,
-)
+NoInternetBanner(visible: true)
 ```
+
+---
+
+## ⚠️ Platform Configuration
+
+### Android
+
+Add permission in `android/app/src/main/AndroidManifest.xml`:
+
+```xml
+<uses-permission android:name="android.permission.INTERNET"/>
+```
+
+---
+
+### iOS
+
+No additional permission required.
+
+If using network calls extensively, ensure App Transport Security allows your endpoints if needed:
+
+```xml
+<key>NSAppTransportSecurity</key>
+<dict>
+  <key>NSAllowsArbitraryLoads</key>
+  <true/>
+</dict>
+```
+
+---
+
+### Web
+
+- Uses browser-based network detection
+- Subject to CORS and browser security restrictions
+- Connectivity checks may not fully match mobile/desktop behavior
+- Host verification and latency may be limited
+
+---
+
+### Desktop (Windows / macOS / Linux)
+
+No additional configuration required.
+
+---
+
+## 💡 Best Practices
+
+- Use default configuration unless needed
+- Avoid very low `checkInterval` (e.g. < 2 seconds) as it may increase network usage
+- Use multiple hosts for reliability
+
+
+---
+
+## Support the Project
+
+If you find **net_checker** useful, you can support its development.
+
+<a href="https://buymeacoffee.com/krunalsinhrana" target="_blank">
+  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" height="45" width="162" alt="Buy Me A Coffee" />
+</a>
+
+---
+
+## 📄 License
+
+MIT License

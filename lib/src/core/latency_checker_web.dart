@@ -1,23 +1,42 @@
-import 'package:http/http.dart' as http;
+import 'dart:async';
+import 'dart:js_interop';
+import 'package:web/web.dart' as web;
 import '../config/internet_config.dart';
 
-/// Web implementation of latency checking.
+/// Web implementation of latency checking using fetch (no-cors)
 ///
-/// Browsers do not support `dart:io`, so we measure latency
-/// using an HTTP request instead.
+/// ✔ Uses real network request (better than fake delay)
+/// ✔ No CORS issues
+/// ✔ Timeout handled
+/// ✔ Works consistently with InternetChecker
+///
+/// ⚠️ NOTE:
+/// - This is still an approximation (browser limitation)
+/// - Status/response cannot be read in no-cors mode
 class LatencyCheckerImpl {
-  /// Measures latency by performing a simple HTTP request.
+  static const String _defaultUrl = "https://clients3.google.com/generate_204";
+
   static Future<int?> getLatency(InternetConfig config) async {
+    /// Quick browser check
+    if (!web.window.navigator.onLine) return null;
+
+    final url = _defaultUrl;
+    ; // config.hosts.isNotEmpty ? config.hosts.first : _defaultUrl;
+
     final stopwatch = Stopwatch()..start();
 
     try {
-      await http
-          .get(Uri.parse("https://${config.latencyHost}"))
-          .timeout(config.timeout);
+      final init = web.RequestInit()
+        ..method = 'GET'
+        ..mode = 'no-cors';
+
+      /// Measure real request time
+      await web.window.fetch(url.toJS, init).toDart.timeout(config.timeout);
 
       stopwatch.stop();
-
       return stopwatch.elapsedMilliseconds;
+    } on TimeoutException {
+      return null;
     } catch (_) {
       return null;
     }
