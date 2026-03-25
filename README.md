@@ -2,14 +2,27 @@
 
 [![pub version](https://img.shields.io/pub/v/net_checker.svg)](https://pub.dev/packages/net_checker)
 [![likes](https://img.shields.io/pub/likes/net_checker)](https://pub.dev/packages/net_checker/score)
-[![popularity](https://img.shields.io/pub/popularity/net_checker)](https://pub.dev/packages/net_checker/score)
 [![license](https://img.shields.io/github/license/lionheart-apps/net_checker)](LICENSE)
 
 A lightweight and cross-platform Flutter package to check internet connectivity, monitor connection changes, measure latency, detect network quality, and identify working hosts.
 
 ---
 
-## ✨ Features
+## Quick Example
+
+```dart
+final connected = await InternetChecker.hasConnection();
+
+if (connected) {
+  print("Connected");
+} else {
+  print("No Internet");
+}
+```
+
+
+
+## Features
 
 | Feature                            | Supported |
 | ---------------------------------- | --------- |
@@ -24,7 +37,7 @@ A lightweight and cross-platform Flutter package to check internet connectivity,
 
 ---
 
-## 📱 Platform Support
+## Platform Support
 
 | Platform | Supported | Notes |
 | -------- | --------- | ----- |
@@ -37,7 +50,21 @@ A lightweight and cross-platform Flutter package to check internet connectivity,
 
 ---
 
-## 🚀 Installation
+## Why net_checker?
+
+Unlike basic connectivity packages, **net_checker** provides:
+
+- Real internet access check (not just network type)
+- Built-in latency measurement
+- Network quality detection (Good / Poor / etc.)
+- Working host detection
+- Ready-to-use UI widgets
+
+All in one lightweight package.
+
+---
+
+## Installation
 
 ```yaml
 dependencies:
@@ -50,7 +77,7 @@ flutter pub get
 
 ---
 
-## 📦 Import
+## Import
 
 ```dart
 import 'package:net_checker/net_checker.dart';
@@ -58,7 +85,7 @@ import 'package:net_checker/net_checker.dart';
 
 ---
 
-## 🔌 Check Internet Connection
+## Check Internet Connection
 
 ```dart
 bool connected = await InternetChecker.hasConnection();
@@ -66,7 +93,7 @@ bool connected = await InternetChecker.hasConnection();
 
 ---
 
-## 🌐 Get Working Host
+## Get Working Host
 
 ```dart
 String? host = await InternetChecker.getWorkingHost();
@@ -74,7 +101,7 @@ String? host = await InternetChecker.getWorkingHost();
 
 ---
 
-## ⚡ Network Latency
+## Network Latency
 
 ```dart
 int? latency = await LatencyChecker.getLatency();
@@ -82,7 +109,7 @@ int? latency = await LatencyChecker.getLatency();
 
 ---
 
-## 📊 Network Quality
+## Network Quality
 
 ```dart
 String quality = await NetworkQuality.getQuality();
@@ -90,7 +117,7 @@ String quality = await NetworkQuality.getQuality();
 
 ---
 
-## 🔄 Listen to Connection Changes
+## Listen to Connection Changes
 
 ```dart
 InternetConnectionStream.start().listen((status) {
@@ -100,7 +127,7 @@ InternetConnectionStream.start().listen((status) {
 
 ---
 
-## ⚙️ Custom Configuration
+## Custom Configuration
 
 ```dart
 final config = InternetConfig(
@@ -121,7 +148,7 @@ await InternetChecker.getWorkingHost(config: config);
 
 ---
 
-## 🧩 Widgets
+## Widgets
 
 ### Internet Status Indicator
 
@@ -147,7 +174,16 @@ NoInternetBanner(visible: true)
 
 ---
 
-## ⚠️ Platform Configuration
+## Use Cases
+
+- Show offline banner in apps
+- Retry API calls automatically
+- Monitor connection quality
+- Detect slow networks
+
+---
+
+## Platform Configuration
 
 ### Android
 
@@ -190,12 +226,20 @@ No additional configuration required.
 
 ---
 
-## 💡 Best Practices
+## Best Practices
 
 - Use default configuration unless needed
 - Avoid very low `checkInterval` (e.g. < 2 seconds) as it may increase network usage
 - Use multiple hosts for reliability
 
+
+---
+
+
+## Author
+
+Developed and maintained by **Lionheartapps**  
+https://www.lionheartapps.com
 
 ---
 
@@ -209,6 +253,12 @@ If you find **net_checker** useful, you can support its development.
 
 ---
 
-## 📄 License
+## License
 
 MIT License
+
+
+## Screenshots
+
+![Connected](assets/connected.png)
+![Disconnected](assets/disconnected.png)

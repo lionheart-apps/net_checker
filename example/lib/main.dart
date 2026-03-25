@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Net Checker',
+      title: 'Net Checker Demo',
       theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.blue),
       home: const HomePage(),
     );
@@ -60,7 +60,7 @@ class _HomePageState extends State<HomePage> {
     return "Device";
   }
 
-  /// 🔥 REAL CHECK (ONLY SOURCE)
+  /// REAL CHECK (ONLY SOURCE)
   Future<void> _checkNow() async {
     bool connected = false;
 
@@ -73,7 +73,7 @@ class _HomePageState extends State<HomePage> {
 
     if (!mounted) return;
 
-    /// 🔥 Prevent unnecessary rebuilds
+    /// Prevent unnecessary rebuilds
     if (connected && status == ConnectionStatus.connected) return;
     if (!connected && status == ConnectionStatus.disconnected) return;
 
@@ -102,16 +102,16 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
-    /// 🔥 STEP 1: Force initial state (important for Web)
+    /// STEP 1: Force initial state (important for Web)
     status = ConnectionStatus.disconnected;
     quality = NetworkQuality.disconnected;
 
-    /// 🔥 STEP 2: Delay first check (Web fix)
+    /// STEP 2: Delay first check (Web fix)
     Future.delayed(const Duration(milliseconds: 300), () {
       _checkNow();
     });
 
-    /// 🔥 STEP 3: Stream trigger
+    /// STEP 3: Stream trigger
     sub = InternetConnectionStream.start(config: config).listen((_) {
       _checkNow();
     });
@@ -203,29 +203,10 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               children: const [
                 Text(
-                  "net_checker • Flutter Package",
+                  "Example App •  net_checker • Flutter Package",
                   style: TextStyle(fontWeight: FontWeight.w600),
                 ),
                 SizedBox(height: 4),
-                Text.rich(
-                  TextSpan(
-                    text: "Powered by ",
-                    style: TextStyle(color: Colors.grey),
-                    children: [
-                      TextSpan(
-                        text: "Lionheartapps",
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Text(
-                  "www.lionheartapps.com",
-                  style: TextStyle(fontSize: 11, color: Colors.grey),
-                ),
               ],
             ),
           ),

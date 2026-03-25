@@ -1,3 +1,9 @@
+## 0.0.6
+
+### Improved
+
+- Improved documentation clarity
+
 ## 0.0.5
 
 Refinement release with improved Web behavior and example app updates.
