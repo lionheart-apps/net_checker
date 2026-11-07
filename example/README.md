@@ -1,17 +1,26 @@
 # net_checker_example
 
-A new Flutter project.
+A demonstrative example application for the [`net_checker`](https://pub.dev/packages/net_checker) Flutter package.
+
+## Features Demonstrated
+
+- Real-time connection status monitoring using `InternetConnectionStream`
+- Measuring network latency (in milliseconds) with `LatencyChecker`
+- Strongly-typed `NetworkQualityLevel` detection (`excellent`, `good`, `slow`, `verySlow`, `disconnected`)
+- Active host verification with `InternetChecker.getWorkingHost()`
+- Dynamic UI updates with offline banner and theme-coded status indicators
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+Run the example on any supported platform:
 
-A few resources to get you started if this is your first Flutter project:
+```bash
+# Android / iOS
+flutter run
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+# Web
+flutter run -d chrome
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+# Desktop (Windows / macOS / Linux)
+flutter run -d windows
+```
