@@ -1,7 +1,7 @@
 import '../config/internet_config.dart';
 
 import 'latency_checker_io.dart'
-    if (dart.library.html) 'latency_checker_web.dart';
+    if (dart.library.js_interop) 'latency_checker_web.dart';
 
 /// Provides utilities for measuring network latency.
 ///

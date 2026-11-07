@@ -1,7 +1,7 @@
 import '../config/internet_config.dart';
 
 import 'internet_checker_io.dart'
-    if (dart.library.html) 'internet_checker_web.dart';
+    if (dart.library.js_interop) 'internet_checker_web.dart';
 
 /// Provides utilities to check internet connectivity.
 ///

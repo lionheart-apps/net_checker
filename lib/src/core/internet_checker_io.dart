@@ -10,70 +10,60 @@ import '../config/internet_config.dart';
 /// - macOS
 /// - Linux
 ///
-/// Uses DNS lookup to verify internet access.
-///
-/// This implementation relies on [InternetConfig.parsedHosts]
-/// so all hosts are already normalized and safe to use.
+/// Uses DNS resolution and lightweight HTTP probing to verify real internet access.
 class InternetCheckerImpl {
   /// Checks whether the device has internet connectivity.
   ///
   /// Strategy:
-  /// - Extract host from parsed Uri
+  /// - Extract host from parsed [Uri]
   /// - Perform DNS lookup
-  /// - Return true on first success
-  ///
-  /// Returns:
-  /// - `true` if at least one host resolves
-  /// - `false` otherwise
+  /// - Probe endpoint via HTTP GET/HEAD
+  /// - Return `true` on first confirmed reachability
   static Future<bool> hasConnection(InternetConfig config) async {
     for (final uri in config.parsedHosts) {
-      try {
-        final host = uri.host;
-        if (host.isEmpty) continue;
-
-        // 1️⃣ DNS lookup
-        final result = await InternetAddress.lookup(
-          host,
-        ).timeout(config.timeout);
-
-        if (result.isEmpty) continue;
-
-        // 2️⃣ HTTP check (important)
-        final client = HttpClient()..connectionTimeout = config.timeout;
-
-        final request = await client.getUrl(uri);
-        final response = await request.close();
-
-        if (response.statusCode >= 200 && response.statusCode < 400) {
-          client.close();
-          return true;
-        }
-
-        client.close();
-      } catch (_) {
-        // try next host
+      if (await _testHost(uri, config.timeout)) {
+        return true;
       }
     }
-
     return false;
   }
 
+  /// Returns the first working host string, or `null` if no connection is available.
   static Future<String?> getWorkingHost(InternetConfig config) async {
     for (final uri in config.parsedHosts) {
-      try {
-        final host = uri.host;
-        if (host.isEmpty) continue;
-
-        final result = await InternetAddress.lookup(
-          host,
-        ).timeout(config.timeout);
-
-        if (result.isNotEmpty) {
-          return host; // ✅ return working host
-        }
-      } catch (_) {}
+      if (await _testHost(uri, config.timeout)) {
+        return uri.host;
+      }
     }
-
     return null;
+  }
+
+  static Future<bool> _testHost(Uri uri, Duration timeout) async {
+    final host = uri.host;
+    if (host.isEmpty) return false;
+
+    HttpClient? client;
+    try {
+      // 1. DNS resolution
+      final addresses = await InternetAddress.lookup(host).timeout(timeout);
+      if (addresses.isEmpty) return false;
+
+      // 2. HTTP probe to verify real transit / bypass captive portals
+      client = HttpClient()..connectionTimeout = timeout;
+      final request = await client.getUrl(uri).timeout(timeout);
+      final response = await request.close().timeout(timeout);
+
+      // Drain response body to release resources immediately
+      await response.drain<void>().timeout(
+            timeout,
+            onTimeout: () => null,
+          );
+
+      return response.statusCode >= 200 && response.statusCode < 400;
+    } catch (_) {
+      return false;
+    } finally {
+      client?.close(force: true);
+    }
   }
 }

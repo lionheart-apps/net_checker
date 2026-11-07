@@ -1,15 +1,12 @@
 /// Represents the current internet connection status.
 ///
-/// This enum is used by the `net_checker` package to indicate whether
+/// This enum is used by `net_checker` to indicate whether
 /// the device currently has an active internet connection.
-///
-/// It is commonly used with the connection monitoring stream
-/// provided by `InternetConnectionStream`.
 ///
 /// Example:
 /// ```dart
 /// InternetConnectionStream.start().listen((status) {
-///   if (status == ConnectionStatus.connected) {
+///   if (status.isConnected) {
 ///     print("Connected to the internet");
 ///   } else {
 ///     print("No internet connection");
@@ -23,10 +20,7 @@ enum ConnectionStatus {
   /// Indicates that the device is not connected to the internet.
   disconnected;
 
-  /// Returns a readable string value.
-  ///
-  /// ⚠️ This does NOT affect existing behavior.
-  /// Safe addition (non-breaking).
+  /// Returns a user-friendly readable string value.
   String get label {
     switch (this) {
       case ConnectionStatus.connected:
@@ -35,4 +29,10 @@ enum ConnectionStatus {
         return "Disconnected";
     }
   }
+
+  /// Whether the status is [ConnectionStatus.connected].
+  bool get isConnected => this == ConnectionStatus.connected;
+
+  /// Whether the status is [ConnectionStatus.disconnected].
+  bool get isDisconnected => this == ConnectionStatus.disconnected;
 }

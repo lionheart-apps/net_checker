@@ -1,3 +1,32 @@
+## 0.0.7
+
+Major stability, performance, and cross-platform compatibility release.
+
+### Added
+
+- WebAssembly (Wasm) support for modern Flutter Web using `dart.library.js_interop`
+- Strongly-typed `NetworkQualityLevel` enum with label and theme color mappings
+- Convenience getters `isConnected` and `isDisconnected` on `ConnectionStatus`
+- Broadcast stream support to allow multiple listeners and widgets simultaneously
+- Immediate status emission on stream subscription (even when starting offline)
+- `stream` and `initialStatus` parameters in status widgets for mock testing
+- Smooth animated transitions and custom icon support in `NoInternetBanner`
+- Comprehensive unit and widget test suite
+
+### Improved
+
+- Upgraded SDK constraint to support modern Flutter (3.19+) and Dart (3.3.0+)
+- Switched default ping endpoints to reliable captive-portal detection hosts
+- Improved socket and `HttpClient` lifecycle with guaranteed closure on errors
+- Removed unused `http` dependency to minimize package footprint
+- Updated example application and added Android INTERNET permissions
+
+### Fixed
+
+- Fixed stream recreation and timer memory leaks on widget rebuilds
+- Fixed missing initial event when starting app without an internet connection
+- Fixed HTTP request timeout issues caused by raw IP DNS hosts
+
 ## 0.0.6
 
 ### Improved

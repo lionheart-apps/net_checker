@@ -129,17 +129,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(title: const Text("Net Checker Demo")),
       body: Column(
         children: [
-          if (!isConnected)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(10),
-              color: Colors.red,
-              child: const Text(
-                "You're offline",
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
+          NoInternetBanner(visible: !isConnected),
 
           Expanded(
             child: Center(

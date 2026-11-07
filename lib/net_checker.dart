@@ -1,5 +1,6 @@
-// net_checker
-// A Flutter package for checking internet connectivity and quality across platforms.
+/// A lightweight, cross-platform Flutter package to check internet connectivity,
+/// monitor connection changes, measure latency, and detect network quality.
+library;
 
 // Config
 export 'src/config/internet_config.dart';

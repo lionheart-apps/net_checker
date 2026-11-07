@@ -3,22 +3,29 @@ import '../core/internet_checker.dart';
 import '../config/internet_config.dart';
 import '../models/connection_status.dart';
 
-/// Provides a stream that monitors internet connectivity.
+/// Provides a reactive stream that monitors internet connectivity.
 ///
-/// Emits a new [ConnectionStatus] ONLY when the state changes.
-///
-/// ✔ Immediate first check (no delay on app start)
-/// ✔ Periodic checks using [checkInterval]
-/// ✔ Prevents duplicate emissions
-/// ✔ Safe fallback to disconnected on errors
-/// ✔ Automatically stops when no listeners
+/// Features:
+/// ✔ Immediate first check (emits initial status on subscription)
+/// ✔ Emits a new [ConnectionStatus] only when state changes
+/// ✔ Broadcast stream — allows multiple widgets and listeners without errors
+/// ✔ Automatic timer cleanup when all listeners unsubscribe
+/// ✔ Safe error handling with fallback to disconnected state
 class InternetConnectionStream {
-  /// Starts listening to connectivity changes.
+  /// Last known connection status across checks.
+  static ConnectionStatus? _lastKnownStatus;
+
+  /// Returns the most recently checked [ConnectionStatus], or `null` if no check has run yet.
+  static ConnectionStatus? get currentStatus => _lastKnownStatus;
+
+  /// Starts listening to connectivity changes using the provided [config].
+  ///
+  /// Returns a broadcast [Stream<ConnectionStatus>].
   ///
   /// Example:
   /// ```dart
-  /// InternetConnectionStream.start().listen((status) {
-  ///   print(status);
+  /// final subscription = InternetConnectionStream.start().listen((status) {
+  ///   print("Internet status: ${status.label}");
   /// });
   /// ```
   static Stream<ConnectionStatus> start({
@@ -26,51 +33,58 @@ class InternetConnectionStream {
   }) {
     late StreamController<ConnectionStatus> controller;
     Timer? timer;
+    ConnectionStatus? last = _lastKnownStatus;
+    bool isChecking = false;
 
-    /// Holds last emitted state to avoid duplicate events
-    ConnectionStatus last = ConnectionStatus.disconnected;
-
-    /// 🔥 Core check logic (single source of truth)
     Future<void> check() async {
-      try {
-        /// Perform actual connectivity check
-        final connected = await InternetChecker.hasConnection(config: config);
+      if (isChecking) return;
+      isChecking = true;
 
-        /// Map boolean to enum
+      try {
+        final connected = await InternetChecker.hasConnection(config: config);
         final status = connected
             ? ConnectionStatus.connected
             : ConnectionStatus.disconnected;
 
-        /// Emit ONLY if status changed
+        _lastKnownStatus = status;
+
         if (status != last) {
           last = status;
-          controller.add(status);
+          if (!controller.isClosed) {
+            controller.add(status);
+          }
         }
       } catch (_) {
-        /// If any error occurs, treat as disconnected
+        _lastKnownStatus = ConnectionStatus.disconnected;
         if (last != ConnectionStatus.disconnected) {
           last = ConnectionStatus.disconnected;
-          controller.add(ConnectionStatus.disconnected);
+          if (!controller.isClosed) {
+            controller.add(ConnectionStatus.disconnected);
+          }
         }
+      } finally {
+        isChecking = false;
       }
     }
 
-    controller = StreamController<ConnectionStatus>(
-      /// Called when first listener subscribes
+    controller = StreamController<ConnectionStatus>.broadcast(
       onListen: () {
-        /// 🔥 1. Immediate check (fixes startup delay issue)
+        // If we already have a known status, emit it immediately to this listener
+        if (last != null && !controller.isClosed) {
+          controller.add(last!);
+        }
+
+        // Perform an initial check
         check();
 
-        /// 🔥 2. Periodic check (fallback polling)
+        // Start periodic monitoring
         timer = Timer.periodic(config.checkInterval, (_) {
           check();
         });
       },
-
-      /// Called when all listeners are removed
       onCancel: () {
-        /// Clean up timer to prevent memory leaks
         timer?.cancel();
+        timer = null;
       },
     );
 

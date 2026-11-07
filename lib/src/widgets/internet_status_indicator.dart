@@ -1,37 +1,43 @@
 import 'package:flutter/material.dart';
-import '../models/connection_status.dart';
-import '../stream/connection_stream.dart';
 import '../config/internet_config.dart';
+import '../models/connection_status.dart';
+import 'internet_status_builder.dart';
 
-/// A widget that displays a visual indicator of the current internet status.
+/// A widget that displays an icon indicating the current internet connection status.
 ///
-/// [InternetStatusIndicator] listens to the connectivity stream provided by
-/// [InternetConnectionStream.start] and displays an icon representing the
-/// current connection state.
+/// Shows a connected icon (default: [Icons.wifi], green) when online, and a
+/// disconnected icon (default: [Icons.wifi_off], red) when offline.
 ///
-/// When the device is connected to the internet, a **green WiFi icon**
-/// is displayed. When the device is offline, a **red WiFi-off icon**
-/// is shown.
+/// Example:
+/// ```dart
+/// const InternetStatusIndicator(size: 28);
+/// ```
 class InternetStatusIndicator extends StatelessWidget {
   /// Optional configuration for connectivity checks.
   final InternetConfig config;
 
-  /// Icon when connected
+  /// Icon to display when connected.
   final IconData connectedIcon;
 
-  /// Icon when disconnected
+  /// Icon to display when disconnected.
   final IconData disconnectedIcon;
 
-  /// Color when connected
+  /// Icon color when connected.
   final Color connectedColor;
 
-  /// Color when disconnected
+  /// Icon color when disconnected.
   final Color disconnectedColor;
 
-  /// Icon size
+  /// The size of the icon in logical pixels.
   final double size;
 
-  /// Creates an [InternetStatusIndicator] widget.
+  /// Optional custom stream to listen to.
+  final Stream<ConnectionStatus>? stream;
+
+  /// Fallback status before the first connection check resolves.
+  final ConnectionStatus? initialStatus;
+
+  /// Creates an [InternetStatusIndicator].
   const InternetStatusIndicator({
     super.key,
     this.config = const InternetConfig(),
@@ -40,17 +46,18 @@ class InternetStatusIndicator extends StatelessWidget {
     this.connectedColor = Colors.green,
     this.disconnectedColor = Colors.red,
     this.size = 24,
+    this.stream,
+    this.initialStatus,
   });
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<ConnectionStatus>(
-      stream: InternetConnectionStream.start(config: config),
-      builder: (context, snapshot) {
-        final status = snapshot.data ?? ConnectionStatus.disconnected;
-
-        final isConnected = status == ConnectionStatus.connected;
-
+    return InternetStatusBuilder(
+      config: config,
+      stream: stream,
+      initialStatus: initialStatus,
+      builder: (context, status) {
+        final isConnected = status.isConnected;
         return Icon(
           isConnected ? connectedIcon : disconnectedIcon,
           color: isConnected ? connectedColor : disconnectedColor,

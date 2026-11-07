@@ -112,6 +112,12 @@ int? latency = await LatencyChecker.getLatency();
 ## Network Quality
 
 ```dart
+// As a strongly-typed enum
+NetworkQualityLevel level = await NetworkQuality.getQualityLevel();
+print(level.label); // "Excellent", "Good", "Slow", "Very Slow", "Disconnected"
+print(level.color); // Colors.green, Colors.orange, etc.
+
+// Or as a string (backward compatible)
 String quality = await NetworkQuality.getQuality();
 ```
 
@@ -121,7 +127,11 @@ String quality = await NetworkQuality.getQuality();
 
 ```dart
 InternetConnectionStream.start().listen((status) {
-  print(status);
+  if (status.isConnected) {
+    print("Online: ${status.label}");
+  } else {
+    print("Offline");
+  }
 });
 ```
 
