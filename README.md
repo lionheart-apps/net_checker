@@ -43,7 +43,7 @@ if (connected) {
 | -------- | --------- | ----- |
 | Android  | ✓         | Requires INTERNET permission |
 | iOS      | ✓         | No extra permission required |
-| Web      | ✓         | Limited by browser security (CORS) |
+| Web      | ✓         | Wasm & JS compatible (`dart.library.js_interop`) |
 | Windows  | ✓         | No extra setup |
 | macOS    | ✓         | No extra setup |
 | Linux    | ✓         | No extra setup |
@@ -68,7 +68,7 @@ All in one lightweight package.
 
 ```yaml
 dependencies:
-  net_checker: ^latest
+  net_checker: ^0.0.7
 ```
 
 ```bash
@@ -163,7 +163,11 @@ await InternetChecker.getWorkingHost(config: config);
 ### Internet Status Indicator
 
 ```dart
-InternetStatusIndicator()
+InternetStatusIndicator(
+  size: 28,
+  connectedColor: Colors.green,
+  disconnectedColor: Colors.red,
+)
 ```
 
 ### Internet Status Builder
@@ -171,7 +175,10 @@ InternetStatusIndicator()
 ```dart
 InternetStatusBuilder(
   builder: (context, status) {
-    return Text(status.toString());
+    if (status.isConnected) {
+      return Text("Online: ${status.label}");
+    }
+    return const Text("Offline");
   },
 )
 ```
@@ -179,7 +186,11 @@ InternetStatusBuilder(
 ### No Internet Banner
 
 ```dart
-NoInternetBanner(visible: true)
+NoInternetBanner(
+  visible: !isConnected,
+  message: "No Internet Connection",
+  animated: true,
+)
 ```
 
 ---
